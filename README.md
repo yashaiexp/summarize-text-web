@@ -193,6 +193,53 @@ This is the most common issue. Follow these steps:
 - Make sure Node.js version is compatible (Vercel uses Node 18+ by default)
 - Ensure `"type": "module"` is in `package.json` (for ES modules)
 
+**"Cannot GET /" error:**
+This means Vercel isn't serving your `index.html` file. Fix it by:
+
+1. **Verify `vercel.json` exists** and contains the correct configuration:
+   ```json
+   {
+     "version": 2,
+     "builds": [
+       {
+         "src": "api/**/*.js",
+         "use": "@vercel/node"
+       }
+     ],
+     "routes": [
+       {
+         "src": "/api/(.*)",
+         "dest": "/api/$1"
+       },
+       {
+         "src": "/(.*)",
+         "dest": "/$1"
+       }
+     ]
+   }
+   ```
+
+2. **Ensure all static files are committed:**
+   ```bash
+   git add index.html styles.css script.js vercel.json
+   git commit -m "Add static files and Vercel config"
+   git push
+   ```
+
+3. **Check Vercel deployment logs:**
+   - Go to Vercel Dashboard → Your Project → Deployments → Latest
+   - Look for "Static files" in the build output
+   - Should see: `index.html`, `styles.css`, `script.js`
+
+4. **Redeploy:**
+   - After pushing changes, Vercel will auto-deploy
+   - Or manually trigger: Deployments → Redeploy
+
+5. **Verify file structure:**
+   - All files (`index.html`, `styles.css`, `script.js`) should be in the root directory
+   - The `api/` folder should contain `summarize.js`
+   - `server.js` is only for local development (Vercel ignores it)
+
 ## Project Structure
 
 ```

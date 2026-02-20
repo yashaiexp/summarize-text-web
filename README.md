@@ -92,14 +92,83 @@ A clean, responsive web application that uses free LLM APIs (Groq or Google Gemi
    - Click **Summarize Text**
    - Copy the summary using the **Copy** button
 
+## Deployment to Vercel
+
+This project is configured to work with Vercel's serverless functions. Follow these steps to deploy:
+
+### Step 1: Push to Git Repository
+
+Make sure your code is pushed to a Git repository (GitHub, GitLab, or Bitbucket).
+
+### Step 2: Connect to Vercel
+
+1. Go to [Vercel](https://vercel.com/) and sign in (or create an account)
+2. Click **Add New Project**
+3. Import your Git repository
+4. Vercel will auto-detect the project settings
+
+### Step 3: Configure Environment Variables
+
+**This is critical!** You must add your API keys in Vercel's dashboard:
+
+1. In your Vercel project dashboard, go to **Settings** → **Environment Variables**
+2. Add the following variables (add at least one API key):
+
+   ```
+   GROQ_API_KEY=your_groq_api_key_here
+   GEMINI_API_KEY=your_gemini_api_key_here
+   GROQ_MODEL=llama-3.1-8b-instant
+   GEMINI_MODEL=gemini-1.5-flash
+   ```
+
+3. **Important**: Select all environments (Production, Preview, Development) when adding each variable
+4. Click **Save**
+
+### Step 4: Deploy
+
+1. Click **Deploy** (or push a new commit to trigger automatic deployment)
+2. Wait for the deployment to complete
+3. Your site will be live at `https://your-project-name.vercel.app`
+
+### Vercel-Specific Notes
+
+- **Serverless Functions**: The API endpoint (`/api/summarize`) runs as a Vercel serverless function
+- **Environment Variables**: API keys are securely stored in Vercel's environment variables (not in code)
+- **Automatic Deployments**: Every push to your main branch triggers a new deployment
+- **Preview Deployments**: Pull requests get preview URLs automatically
+
+### Troubleshooting Vercel Deployment
+
+**"Missing API_KEY" error:**
+- Go to Vercel Dashboard → Settings → Environment Variables
+- Verify your API keys are added and saved
+- Make sure you selected all environments (Production, Preview, Development)
+- Redeploy after adding environment variables
+
+**Function timeout:**
+- Vercel free tier has a 10-second timeout for serverless functions
+- If summaries take too long, try shorter input text or upgrade your Vercel plan
+
+**CORS errors:**
+- The serverless function includes CORS headers automatically
+- If you see CORS errors, check that you're accessing the deployed URL (not localhost)
+
+**Build errors:**
+- Ensure `package.json` includes all dependencies
+- Check Vercel build logs for specific error messages
+- Make sure Node.js version is compatible (Vercel uses Node 18+ by default)
+
 ## Project Structure
 
 ```
 AiTextSummarize/
+├── api/
+│   └── summarize.js    # Vercel serverless function (for deployment)
 ├── index.html          # Main HTML structure
 ├── styles.css          # Styling and responsive design
 ├── script.js           # Frontend JavaScript logic
-├── server.js           # Express server with API endpoints
+├── server.js           # Express server (for local development)
+├── vercel.json         # Vercel configuration
 ├── package.json        # Node.js dependencies
 ├── .env.example        # Environment variables template
 ├── .env                # Your API keys (create this, not in git)
@@ -168,15 +237,17 @@ Summarizes text using the specified LLM provider.
 ### Making Changes
 
 - **Frontend**: Edit `index.html`, `styles.css`, or `script.js`
-- **Backend**: Edit `server.js` for API logic
+- **Backend (Local)**: Edit `server.js` for local development
+- **Backend (Vercel)**: Edit `api/summarize.js` for Vercel deployment
 - **Restart**: After changing `server.js`, restart the server (`Ctrl+C` then `npm start`)
+- **Note**: For Vercel, changes to `api/summarize.js` will be deployed automatically on push
 
 ### Adding New Providers
 
 To add a new LLM provider:
 
-1. Add provider function in `server.js` (similar to `summarizeWithGroq` or `summarizeWithGemini`)
-2. Add API key to `.env.example` and `.env`
+1. Add provider function in both `server.js` (local) and `api/summarize.js` (Vercel)
+2. Add API key to `.env.example` and `.env` (and Vercel environment variables)
 3. Add option to provider dropdown in `index.html`
 4. Update `script.js` to handle the new provider value
 
@@ -187,10 +258,15 @@ This project is open source and available for personal and educational use.
 ## Credits
 
 Built with:
-- [Express.js](https://expressjs.com/) - Web server
+- [Express.js](https://expressjs.com/) - Web server (local development)
+- [Vercel](https://vercel.com/) - Serverless deployment platform
 - [Groq](https://groq.com/) - LLM API provider
 - [Google Gemini](https://deepmind.google/technologies/gemini/) - LLM API provider
 
 ---
 
-**Note**: Keep your `.env` file secure and never commit it to version control. The `.gitignore` file is already configured to exclude it.
+## Important Security Notes
+
+- **Never commit `.env`**: Keep your `.env` file secure and never commit it to version control. The `.gitignore` file is already configured to exclude it.
+- **Vercel Environment Variables**: For Vercel deployments, add API keys in the Vercel dashboard (Settings → Environment Variables), not in your code.
+- **API Keys**: API keys are stored server-side only and never exposed to the browser, ensuring your keys remain secure.

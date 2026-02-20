@@ -140,38 +140,55 @@ Make sure your code is pushed to a Git repository (GitHub, GitLab, or Bitbucket)
 ### Troubleshooting Vercel Deployment
 
 **NOT_FOUND (404) Error:**
-This is the most common issue. Follow these steps:
+This is the most common issue. Follow these steps **in order**:
 
-1. **Verify the API file exists in Git:**
+1. **CRITICAL: Verify the API file is committed to Git:**
    ```bash
+   # Check if file is tracked
    git ls-files | grep api/summarize.js
-   ```
-   If it doesn't show up, the file isn't committed:
-   ```bash
+   
+   # If nothing shows, add and commit it:
    git add api/summarize.js
+   git add api/  # Ensure the api folder is tracked
    git commit -m "Add Vercel serverless function"
    git push
    ```
 
-2. **Check file location:**
-   - The file must be at `api/summarize.js` (lowercase `api` folder)
-   - Vercel auto-detects files in the `/api` folder
-   - No `vercel.json` is needed for basic serverless functions
+2. **Verify file structure:**
+   - File must be at: `api/summarize.js` (exact path, lowercase `api`)
+   - File must export: `export default async function handler(req, res)`
+   - Check locally: `ls -la api/summarize.js` should show the file
 
-3. **Verify deployment:**
-   - Go to Vercel Dashboard → Your Project → Deployments
-   - Check the latest deployment logs
-   - Look for "Detected Serverless Functions" in the build output
-   - You should see: `api/summarize.js`
+3. **Check Vercel Build Logs:**
+   - Go to: Vercel Dashboard → Your Project → Deployments → Latest Deployment → Build Logs
+   - Look for: `"Detected Serverless Functions"` or `"api/summarize.js"`
+   - If you DON'T see it, the file isn't in Git or Vercel isn't detecting it
 
-4. **Redeploy:**
-   - After committing the file, Vercel should auto-deploy
-   - Or manually trigger: Deployments → Redeploy
+4. **If function is NOT detected in logs:**
+   - Ensure `package.json` has `"type": "module"` (for ES modules)
+   - Try creating a simple test: Add `api/test.js` with:
+     ```js
+     export default (req, res) => res.json({ ok: true });
+     ```
+   - Commit and push, check if `test.js` is detected
+   - If `test.js` works but `summarize.js` doesn't, there's a syntax error
 
-5. **Test the endpoint:**
-   - Visit: `https://your-project.vercel.app/api/summarize`
-   - Should return 405 (Method Not Allowed) for GET, which means the function exists
+5. **Redeploy after fixes:**
+   - Push your changes: `git push`
+   - Wait for auto-deploy OR manually: Deployments → Latest → "..." → Redeploy
+   - **Important**: After adding environment variables, you MUST redeploy
+
+6. **Test the endpoint:**
+   - Visit: `https://your-project.vercel.app/api/summarize` in browser
+   - Should return `405 Method Not Allowed` (means function exists!)
+   - If you get `404`, the function isn't deployed
    - Use POST from your frontend to actually call it
+
+7. **Common fixes:**
+   - Ensure no `vercel.json` is interfering (delete it if present)
+   - Ensure `api/summarize.js` is in the root `api/` folder, not nested
+   - Check that file has proper ES module syntax (`export default`)
+   - Verify Node.js version in Vercel (should be 18+)
 
 **"Missing API_KEY" error:**
 - Go to Vercel Dashboard → Settings → Environment Variables

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Text Summarizer</title>
+    <meta
+      name="description"
+      content="A clean, responsive text summarizer that generates a short summary from your input."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <div class="badge" aria-hidden="true">Simple • Fast • Responsive</div>
+        <h1>AI Text Summarizer</h1>
+        <p class="subhead">
+          Paste text, click summarize, and get a short, readable summary.
+        </p>
+      </header>
+
+      <section class="card" aria-label="Summarize text">
+        <div class="field">
+          <div class="fieldHeader">
+            <label for="inputText">Your text</label>
+            <div class="meta" id="counts" aria-live="polite"></div>
+          </div>
+          <textarea
+            id="inputText"
+            name="inputText"
+            rows="10"
+            placeholder="Paste or type your text here…"
+            autocomplete="off"
+            spellcheck="true"
+          ></textarea>
+          <div class="llmRow" aria-label="LLM provider">
+            <div class="hint">
+              Provider (uses your local server; API keys stay in <code>.env</code>):
+            </div>
+            <select id="providerSelect" class="select" aria-label="Provider">
+              <option value="groq" selected>Groq</option>
+              <option value="gemini">Gemini</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="summarizeBtn" class="primary" type="button">
+            Summarize Text
+          </button>
+          <button id="clearBtn" class="ghost" type="button">Clear</button>
+          <div class="status" role="status" aria-live="polite" id="status"></div>
+        </div>
+      </section>
+
+      <section class="card" aria-label="Summary result">
+        <div class="resultHeader">
+          <h2>Summary</h2>
+          <div class="resultActions">
+            <button id="copyBtn" class="ghost" type="button" disabled>
+              Copy
+            </button>
+          </div>
+        </div>
+        <div id="result" class="result empty" aria-live="polite">
+          Your summary will appear here.
+        </div>
+      </section>
+
+      <footer class="footer">
+        <span>Built with HTML • CSS • JavaScript</span>
+      </footer>
+    </main>
+
+    <script src="./script.js" defer></script>
+  </body>
+</html>

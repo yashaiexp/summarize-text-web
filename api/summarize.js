@@ -159,12 +159,18 @@ export default async function handler(req, res) {
     }
   }
 
-  // Parse request body
+  // Parse request body (Vercel already parses JSON, but handle both cases)
   let body;
   try {
-    body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-  } catch {
-    return badRequest("Invalid JSON in request body");
+    if (typeof req.body === "string") {
+      body = JSON.parse(req.body);
+    } else if (req.body && typeof req.body === "object") {
+      body = req.body;
+    } else {
+      return badRequest("Invalid request body");
+    }
+  } catch (e) {
+    return badRequest("Invalid JSON in request body", e instanceof Error ? e.message : String(e));
   }
 
   const text = typeof body?.text === "string" ? body.text : "";

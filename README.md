@@ -139,6 +139,40 @@ Make sure your code is pushed to a Git repository (GitHub, GitLab, or Bitbucket)
 
 ### Troubleshooting Vercel Deployment
 
+**NOT_FOUND (404) Error:**
+This is the most common issue. Follow these steps:
+
+1. **Verify the API file exists in Git:**
+   ```bash
+   git ls-files | grep api/summarize.js
+   ```
+   If it doesn't show up, the file isn't committed:
+   ```bash
+   git add api/summarize.js
+   git commit -m "Add Vercel serverless function"
+   git push
+   ```
+
+2. **Check file location:**
+   - The file must be at `api/summarize.js` (lowercase `api` folder)
+   - Vercel auto-detects files in the `/api` folder
+   - No `vercel.json` is needed for basic serverless functions
+
+3. **Verify deployment:**
+   - Go to Vercel Dashboard → Your Project → Deployments
+   - Check the latest deployment logs
+   - Look for "Detected Serverless Functions" in the build output
+   - You should see: `api/summarize.js`
+
+4. **Redeploy:**
+   - After committing the file, Vercel should auto-deploy
+   - Or manually trigger: Deployments → Redeploy
+
+5. **Test the endpoint:**
+   - Visit: `https://your-project.vercel.app/api/summarize`
+   - Should return 405 (Method Not Allowed) for GET, which means the function exists
+   - Use POST from your frontend to actually call it
+
 **"Missing API_KEY" error:**
 - Go to Vercel Dashboard → Settings → Environment Variables
 - Verify your API keys are added and saved
@@ -157,18 +191,18 @@ Make sure your code is pushed to a Git repository (GitHub, GitLab, or Bitbucket)
 - Ensure `package.json` includes all dependencies
 - Check Vercel build logs for specific error messages
 - Make sure Node.js version is compatible (Vercel uses Node 18+ by default)
+- Ensure `"type": "module"` is in `package.json` (for ES modules)
 
 ## Project Structure
 
 ```
 AiTextSummarize/
 ├── api/
-│   └── summarize.js    # Vercel serverless function (for deployment)
+│   └── summarize.js    # Vercel serverless function (auto-detected by Vercel)
 ├── index.html          # Main HTML structure
 ├── styles.css          # Styling and responsive design
 ├── script.js           # Frontend JavaScript logic
 ├── server.js           # Express server (for local development)
-├── vercel.json         # Vercel configuration
 ├── package.json        # Node.js dependencies
 ├── .env.example        # Environment variables template
 ├── .env                # Your API keys (create this, not in git)
